@@ -9,10 +9,11 @@ export default function(sequelize, DataTypes) {
       autoIncrement: true
     },
     user_name: DataTypes.STRING,
-    email: DataTypes.TEXT,
+    email: DataTypes.STRING,
     pid: DataTypes.INTEGER,
+    images:DataTypes.TEXT,
     password: DataTypes.STRING,
     remark: DataTypes.TEXT,
-    DeviceID: DataTypes.STRING
+    device_id: DataTypes.STRING
   });
 }

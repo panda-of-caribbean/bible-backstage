@@ -17,11 +17,7 @@ function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
     return function(entity) {
       if(entity) {
-        if (entity.dataValues && res.req.route.path === '/:userName') {
-          res.status(201).json({error:'该用户已存在', status: 201});
-        } else {
-          return res.status(statusCode).json(entity);
-        }
+       res.status(statusCode).json(entity);
       }
       return null;
     };
@@ -68,6 +64,10 @@ function handleError(res, statusCode) {
   };
 }
 
+function BadRequest(req, res) {
+    return res.status(400).send({message:'xxx'});
+}
+
 // Gets a list of Users
 export function index(req, res) {
   return User.findAll()
@@ -89,10 +89,32 @@ export function show(req, res) {
 
 // Creates a new User in the DB
 export function create(req, res) {
-  console.log(req.body);
-  return User.create(req.body)
-    .then(respondWithResult(res, 201))
-    .catch(handleError(res));
+  const reqBody = req.body;
+  const reqParams = req.params;
+  return User.find({
+    where: {
+      user_name: reqBody.user_name
+    }
+}).then((entity) => {
+    if (entity) {
+      res.status(400).send({error:'该用户已存在', status: 400});
+    } else if (entity && entity.dataValues.device_id) {
+      User.upsert(reqBody, {
+          where: {
+            device_id: reqParams.device_id
+          }
+        })
+        .then((entity) => {
+          res.status(200).send({data: entity.dataValues});
+        })
+    } else {
+      User.create(reqBody)
+        .then((entity) => {
+          delete entity.dataValues.password;
+          res.status(200).send({data: entity.dataValues});
+        })
+    }
+  })
 }
 
 // Upserts the given User in the DB at the specified ID

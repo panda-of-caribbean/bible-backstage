@@ -64,25 +64,12 @@ export class MainController {
               return false;
             } else {
               const user_name = $scope.vm.user_name;
-
-              $http.get(`/api/users/${user_name}`)
-                .then(response => {
-                  if (response.status === 200 && response.data.data.length === 0) {
-                    $http.post('/api/users', $scope.vm).then((response) => {
-                      $uibModalInstance.close(response);
-                    }, (error) => {
-                      console.log(error);
-                    });
-                  } else {
-                    console.log(response);
-                    $scope.EXIT = response.data.error;
-                  }
-                }, (error) => {
-                  console.log(error);
-
-                });
-
-
+              $http.post('/api/users', $scope.vm).then((response) => {
+                console.log(response);
+                $uibModalInstance.close(response);
+              }, (error) => {
+                console.log(error);
+              });
             }
           };
           $scope.cancel = function() {
