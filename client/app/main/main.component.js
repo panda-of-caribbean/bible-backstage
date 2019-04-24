@@ -63,7 +63,15 @@ export class MainController {
             if (myForm.$valid === false) {
               return false;
             } else {
-              const user_name = $scope.vm.user_name;
+              // const test = {
+              //   "device_id": "0f0e65b5-8437-381e-bfe3-ec5fe4488110",
+              //   "email": "",
+              //   "images": "https://graph.facebook.com/v3.2/838673536492614/picture?height=300&width=300&migration_overrides=%7Boctober_2012%3Atrue%7D",
+              //   "pid": "838673536492614",
+              //   "remark": "facebook",
+              //   "user_name": "陈凯华"
+              // }
+              // const user_name = $scope.vm.user_name;
               $http.post('/api/users', $scope.vm).then((response) => {
                 console.log(response);
                 $uibModalInstance.close(response);
