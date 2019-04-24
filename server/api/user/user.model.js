@@ -14,6 +14,7 @@ export default function(sequelize, DataTypes) {
     images:DataTypes.TEXT,
     password: DataTypes.STRING,
     remark: DataTypes.TEXT,
+    head_url: DataTypes.TEXT,
     device_id: DataTypes.STRING
   });
 }

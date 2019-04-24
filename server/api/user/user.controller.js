@@ -12,6 +12,8 @@
 
 import jsonpatch from 'fast-json-patch';
 import {User} from '../../sqldb';
+import jiami from 'utility';
+import fs from 'fs';
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -91,6 +93,21 @@ export function show(req, res) {
 export function create(req, res) {
   const reqBody = req.body;
   const reqParams = req.params;
+  const path = 'client/assets/images/'+ Date.now() +'.png';
+  if (reqBody.password) {
+    reqBody.password=jiami.md5(reqBody.password);
+  }
+  if (reqBody.head_url) {
+    var base64Data = reqBody.head_url.replace(/^data:image\/\w+;base64,/, "");
+    var dataBuffer = new Buffer(base64Data, 'base64');
+    fs.writeFile(path, dataBuffer, function(err) {
+      if(err){
+        res.send(err);
+      }else{
+        reqBody.head_url = path;
+      }
+    });
+  }
   return User.find({
     where: {
       user_name: reqBody.user_name
