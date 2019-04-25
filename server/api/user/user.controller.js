@@ -112,19 +112,27 @@ export function create(req, res) {
   }
   return User.find({
     where: {
-      user_name: reqBody.user_name
+      $or: {
+        user_name: reqBody.user_name,
+        device_id: reqBody.device_id
+      }
     }
 }).then((entity) => {
-    if (entity) {
-      res.status(400).send({error:'该用户已存在', status: 400});
-    } else if (entity && entity.dataValues.device_id) {
-      User.upsert(reqBody, {
+    console.log('zzzzzzzzzz');
+    console.log(entity);
+    if (entity && (entity.dataValues['user_name'] === reqBody['user_name'] ||
+      (entity.dataValues['device_id'].indexOf(reqBody['device_id']) !== -1 ) && entity.dataValues['user_name'])) {
+      res.status(400).send({error:'该用户已存在或者该设备已经被绑定', status: 400});
+    } else if (entity && !entity.dataValues['user_name'] && entity.dataValues['device_id'] === reqBody['device_id']) {
+      User.update(reqBody, {
           where: {
-            device_id: reqParams.device_id
+            device_id: reqBody.device_id
           }
         })
         .then((entity) => {
-          res.status(200).send({data: entity.dataValues});
+          console.log('uuuuuuuuu');
+          console.log(entity);
+          res.status(200).send({data: reqBody});
         })
     } else {
       User.create(reqBody)
@@ -140,16 +148,30 @@ export function create(req, res) {
 
 // Upserts the given User in the DB at the specified ID
 export function upsert(req, res) {
-  if(req.body._id) {
-    delete req.body._id;
+  if(req.body.id) {
+    delete req.body.id;
   }
-
-  return User.upsert(req.body, {
+  const reqBody = req.body;
+  const path = 'client/assets/images/'+ Date.now() +'.png';
+  if (reqBody.head_url) {
+    var base64Data = reqBody.head_url.replace(/^data:image\/\w+;base64,/, "");
+    var dataBuffer = new Buffer(base64Data, 'base64');
+    fs.writeFile(path, dataBuffer, function(err) {
+      if(err){
+        res.send(err);
+      }else{
+        reqBody.head_url = path;
+      }
+    });
+  }
+  return User.update({head_url: path}, {
     where: {
-      _id: req.params.id
+      _id: parseInt(req.params.id, 10)
     }
   })
-    .then(respondWithResult(res))
+    .then((entity) => {
+      res.status(200).send({data: path});
+    })
     .catch(handleError(res));
 }
 

@@ -8,16 +8,20 @@
       </div>
       <div class="panel-body">
         <table class="table table-bordered">
-          <tr>
-            <td colspan="5" class="text-right">
-              <button type="button" class="btn btn-primary" ng-click="$ctrl.addUser()">测试</button>
-            </td>
-          </tr>
+          <!--<tr>-->
+            <!--<td colspan="5" class="text-right">-->
+              <!--<button type="button" class="btn btn-primary" ng-click="$ctrl.addUser()">测试</button>-->
+            <!--</td>-->
+          <!--</tr>-->
           <tr>
             <td>ID</td>
             <td>用户名</td>
             <td>Email</td>
+            <td>第三方头像</td>
             <td>PID</td>
+            <td>用户头像</td>
+            <td>设备ID</td>
+            <td>备注</td>
             <td>操作</td>
           </tr>
           <tr ng-repeat="user in $ctrl.awesomeUsers track by $index">
@@ -31,7 +35,19 @@
               {{user.email}}
             </td>
             <td>
+              <a target="_blank" ng-href="{{user.images}}" class="glyphicon glyphicon-new-window" aria-hidden="true"></a>
+            </td>
+            <td>
               {{user.pid}}
+            </td>
+            <td>
+              <a ng-if="user.head_url" target="_blank" ng-href="{{user.head_url}}" class="glyphicon glyphicon-new-window" aria-hidden="true"></a>
+            </td>
+            <td>
+              {{user.device_id}}
+            </td>
+            <td>
+              {{user.remark}}
             </td>
             <td class="text-center">
               <button type="button" class="btn btn-danger" ng-click="$ctrl.deleteUser(user)">删除</button>
