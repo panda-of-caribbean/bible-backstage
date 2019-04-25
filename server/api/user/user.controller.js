@@ -92,6 +92,8 @@ export function show(req, res) {
 // Creates a new User in the DB
 export function create(req, res) {
   const reqBody = req.body;
+  console.log('yyyyyyyyy');
+  console.log(reqBody);
   const reqParams = req.params;
   const path = 'client/assets/images/'+ Date.now() +'.png';
   if (reqBody.password) {
@@ -127,6 +129,8 @@ export function create(req, res) {
     } else {
       User.create(reqBody)
         .then((entity) => {
+          console.log('xxxxxxxxx');
+          console.log(entity);
           delete entity.dataValues.password;
           res.status(200).send({data: entity.dataValues});
         })
