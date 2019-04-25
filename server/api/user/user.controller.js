@@ -94,21 +94,8 @@ export function create(req, res) {
   const reqBody = req.body;
   console.log('yyyyyyyyy');
   console.log(reqBody);
-  const reqParams = req.params;
-  const path = 'client/assets/images/'+ Date.now() +'.png';
   if (reqBody.password) {
     reqBody.password=jiami.md5(reqBody.password);
-  }
-  if (reqBody.head_url) {
-    var base64Data = reqBody.head_url.replace(/^data:image\/\w+;base64,/, "");
-    var dataBuffer = new Buffer(base64Data, 'base64');
-    fs.writeFile(path, dataBuffer, function(err) {
-      if(err){
-        res.send(err);
-      }else{
-        reqBody.head_url = path;
-      }
-    });
   }
   return User.find({
     where: {
