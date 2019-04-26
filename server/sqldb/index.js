@@ -14,6 +14,7 @@ var db = {
 };
 
 // Insert models below
+db.Bookmark = db.sequelize.import('../api/bookmark/bookmark.model');
 db.User = db.sequelize.import('../api/user/user.model');
 db.Thing = db.sequelize.import('../api/thing/thing.model');
 
