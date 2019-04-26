@@ -94,7 +94,7 @@ export class MainController {
   }
 
   deleteUser (user) {
-    this.$http.delete(`/api/users/${user._id}`).then((response => {
+    this.$http.delete(`/api/users/${user.user_id}`).then((response => {
       console.log(response);
     }, (error) => {
 

@@ -109,7 +109,7 @@ export function create(req, res) {
     console.log(entity);
     if (entity && (entity.dataValues['user_name'] === reqBody['user_name'] ||
       (entity.dataValues['device_id'].indexOf(reqBody['device_id']) !== -1 ) && entity.dataValues['user_name'])) {
-      res.status(400).send({error:'该用户已存在或者该设备已经被绑定', status: 400});
+      res.status(400).send({error : {msg: '该用户已存在或者该设备已经被绑定'}, status: 400});
     } else if (entity && !entity.dataValues['user_name'] && entity.dataValues['device_id'] === reqBody['device_id']) {
       User.update(reqBody, {
           where: {
@@ -119,7 +119,7 @@ export function create(req, res) {
         .then((entity) => {
           console.log('uuuuuuuuu');
           console.log(entity);
-          res.status(200).send({data: reqBody});
+          res.status(200).send({data: reqBody, status: 200});
         })
     } else {
       User.create(reqBody)
@@ -127,7 +127,7 @@ export function create(req, res) {
           console.log('xxxxxxxxx');
           console.log(entity);
           delete entity.dataValues.password;
-          res.status(200).send({data: entity.dataValues});
+          res.status(200).send({data: entity.dataValues, status: 200});
         })
     }
   })
@@ -135,41 +135,41 @@ export function create(req, res) {
 
 // Upserts the given User in the DB at the specified ID
 export function upsert(req, res) {
-  if(req.body.id) {
-    delete req.body.id;
+  if(req.body.user_id) {
+    delete req.body.user_id;
   }
   const reqBody = req.body;
   const path = 'client/assets/images/'+ Date.now() +'.png';
-  if (reqBody.head_url) {
-    var base64Data = reqBody.head_url.replace(/^data:image\/\w+;base64,/, "");
+  if (reqBody.images) {
+    var base64Data = reqBody.images.replace(/^data:image\/\w+;base64,/, "");
     var dataBuffer = new Buffer(base64Data, 'base64');
     fs.writeFile(path, dataBuffer, function(err) {
       if(err){
         res.send(err);
       }else{
-        reqBody.head_url = path;
+        reqBody.images = path;
       }
     });
   }
-  return User.update({head_url: path}, {
+  return User.update({images: path}, {
     where: {
-      _id: parseInt(req.params.id, 10)
+      user_id: parseInt(req.params.id, 10)
     }
   })
     .then((entity) => {
-      res.status(200).send({data: path});
+      res.status(200).send({data: path, status: 200});
     })
     .catch(handleError(res));
 }
 
 // Updates an existing User in the DB
 export function patch(req, res) {
-  if(req.body._id) {
-    delete req.body._id;
+  if(req.body.user_id) {
+    delete req.body.user_id;
   }
   return User.find({
     where: {
-      _id: req.params.id
+      user_id: req.params.id
     }
   })
     .then(handleEntityNotFound(res))
@@ -182,7 +182,7 @@ export function patch(req, res) {
 export function destroy(req, res) {
   return User.find({
     where: {
-      _id: req.params.id
+      user_id: req.params.id
     }
   })
     .then(handleEntityNotFound(res))
