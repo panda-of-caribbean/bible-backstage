@@ -7,12 +7,23 @@
  * PATCH   /api/users/:id          ->  patch
  * DELETE  /api/users/:id          ->  destroy
  */
+// var secret = 'thankgodforgivingmefood001';
+// var ss = entity.dataValues['password']; //这是user加密后的结果	赋值给变量ss
+// var decipher = crypto.createDecipher('aes192', secret);
+// var dec = decipher.update(ss, 'hex', 'utf8'); //编码方式从hex转为utf-8;
+// dec += decipher.final('utf8'); //编码方式从utf-8;
+// console.log(JSON.parse(dec));
+
+
+
+
 
 'use strict';
 
 import jsonpatch from 'fast-json-patch';
 import {User} from '../../sqldb';
 import jiami from 'utility';
+import crypto from 'crypto';
 import fs from 'fs';
 
 function respondWithResult(res, statusCode) {
@@ -89,49 +100,132 @@ export function show(req, res) {
     .catch(handleError(res));
 }
 
-// Creates a new User in the DB
+
+//登录 注册
 export function create(req, res) {
   const reqBody = req.body;
-  console.log('yyyyyyyyy');
   console.log(reqBody);
   if (reqBody.password) {
-    reqBody.password=jiami.md5(reqBody.password);
+    var str = JSON.stringify(reqBody.password); //明文
+    var secret = 'thankgodforgivingmefood001'; //密钥
+    var cipher = crypto.createCipher('aes192', secret);
+    var enc = cipher.update(str, 'utf8', 'hex'); //编码方式从utf-8转为hex;
+    enc += cipher.final('hex'); //编码方式从转为hex;
+    reqBody.password=enc;
   }
-  return User.find({
-    where: {
-      $or: {
-        user_name: reqBody.user_name,
-        device_id: reqBody.device_id
-      }
-    }
-}).then((entity) => {
-    console.log('zzzzzzzzzz');
-    console.log(entity);
-    if (entity && (entity.dataValues['user_name'] === reqBody['user_name'] ||
-      (entity.dataValues['device_id'].indexOf(reqBody['device_id']) !== -1 ) && entity.dataValues['user_name'])) {
-      res.status(400).send({error : {msg: '该用户已存在或者该设备已经被绑定'}, status: 400});
-    } else if (entity && !entity.dataValues['user_name'] && entity.dataValues['device_id'] === reqBody['device_id']) {
-      User.update(reqBody, {
-          where: {
-            device_id: reqBody.device_id
+  // 第三方登录
+  if (reqBody.login_type !== 'local') {
+    return User.find({
+      where: {
+          $or: {
+            pid: reqBody['pid'],
+            device_id: reqBody['device_id']
           }
-        })
-        .then((entity) => {
-          console.log('uuuuuuuuu');
-          console.log(entity);
+      }
+    }).then((entity) => {
+      if (entity) {
+        if (entity.dataValues['email'] && entity.dataValues['password']) {
+          User.update(reqBody, {
+            where: {
+              device_id: reqBody['device_id']
+            }
+          })
+          .then((entity) => {
+            console.log('sssssss');
+            delete reqBody['password'];
+            res.status(200).send({data: reqBody, status: 200});
+          })
+        } else {
           res.status(200).send({data: reqBody, status: 200});
-        })
-    } else {
-      User.create(reqBody)
+        }
+
+      } else {
+        User.create(reqBody)
         .then((entity) => {
-          console.log('xxxxxxxxx');
-          console.log(entity);
-          delete entity.dataValues.password;
+          if (entity.dataValues['password']) {
+            delete entity.dataValues.password;
+          }
           res.status(200).send({data: entity.dataValues, status: 200});
         })
-    }
-  })
+      }
+    })
+  } else {
+    return User.find({
+      where: {
+        $or: {
+          user_name: reqBody['user_name'],
+          email: reqBody['email']
+        }
+      }
+    }).then((entity) => {
+      if (!entity) {
+        User.create(reqBody)
+          .then((entity) => {
+            if (entity.dataValues['password']) {
+              delete entity.dataValues.password;
+            }
+            res.status(200).send({data: entity.dataValues, status: 200});
+          })
+      } else {
+        console.log('22222222');
+        console.log(entity.dataValues);
+        if (entity.dataValues['password'] === reqBody.password) {
+          delete entity.dataValues.password;
+          res.status(200).send({data: entity.dataValues, status: 200});
+        } else {
+          res.status(400).send({error: {msg: '账号已存在或者密码错误'}, status: 400});
+        }
+
+      }
+
+    })
+  }
 }
+
+
+// Creates a new User in the DB
+// export function create(req, res) {
+//   const reqBody = req.body;
+//   console.log('yyyyyyyyy');
+//   console.log(reqBody);
+//   if (reqBody.password) {
+//     reqBody.password=jiami.md5(reqBody.password);
+//   }
+//   return User.find({
+//     where: {
+//       $or: {
+//         user_name: reqBody.user_name,
+//         device_id: reqBody.device_id
+//       }
+//     }
+// }).then((entity) => {
+//     console.log('zzzzzzzzzz');
+//     console.log(entity);
+//     if (entity && (entity.dataValues['user_name'] === reqBody['user_name'] ||
+//       (entity.dataValues['device_id'].indexOf(reqBody['device_id']) !== -1 ) && entity.dataValues['user_name'])) {
+//       res.status(400).send({error : {msg: '该用户已存在或者该设备已经被绑定'}, status: 400});
+//     } else if (entity && !entity.dataValues['user_name'] && entity.dataValues['device_id'] === reqBody['device_id']) {
+//       User.update(reqBody, {
+//           where: {
+//             device_id: reqBody.device_id
+//           }
+//         })
+//         .then((entity) => {
+//           console.log('uuuuuuuuu');
+//           console.log(entity);
+//           res.status(200).send({data: reqBody, status: 200});
+//         })
+//     } else {
+//       User.create(reqBody)
+//         .then((entity) => {
+//           console.log('xxxxxxxxx');
+//           console.log(entity);
+//           delete entity.dataValues.password;
+//           res.status(200).send({data: entity.dataValues, status: 200});
+//         })
+//     }
+//   })
+// }
 
 // Upserts the given User in the DB at the specified ID
 export function upsert(req, res) {

@@ -15,6 +15,7 @@ export default function(sequelize, DataTypes) {
     password: DataTypes.STRING,
     remark: DataTypes.TEXT,
     head_url: DataTypes.TEXT,
-    device_id: DataTypes.STRING
+    device_id: DataTypes.STRING,
+    login_type: DataTypes.STRING
   });
 }
