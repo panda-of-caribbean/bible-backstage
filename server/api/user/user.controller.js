@@ -152,28 +152,47 @@ export function create(req, res) {
   } else {
     return User.find({
       where: {
-        $or: {
-          user_name: reqBody['user_name'],
           email: reqBody['email']
-        }
       }
     }).then((entity) => {
       if (!entity) {
-        User.create(reqBody)
-          .then((entity) => {
-            if (entity.dataValues['password']) {
-              delete entity.dataValues.password;
-            }
-            res.status(200).send({data: entity.dataValues, status: 200});
-          })
+        if (reqBody['user_name'] && reqBody['email'] && reqBody['password']) {
+          User.create(reqBody)
+            .then((entity) => {
+              if (entity.dataValues['password']) {
+                delete entity.dataValues.password;
+              }
+              res.status(200).send({data: entity.dataValues, status: 200});
+            })
+        } else {
+          res.status(400).send({error: {msg: '用户名或密码错误'}, status: 400});
+        }
+
       } else {
+        // pid
         console.log('22222222');
         console.log(entity.dataValues);
-        if (entity.dataValues['password'] === reqBody.password) {
-          delete entity.dataValues.password;
-          res.status(200).send({data: entity.dataValues, status: 200});
+        console.log(reqBody);
+        if (entity.dataValues['user_name'] && entity.dataValues['email'] &&
+          entity.dataValues['pid'] && reqBody['password']) {
+          User.update(reqBody, {
+              where: {
+                user_id: entity.dataValues['user_id']
+              }
+            })
+            .then((entity) => {
+              console.log('xxxxx');
+              console.log(entity);
+              delete reqBody['password'];
+              res.status(200).send({data: reqBody, status: 200});
+            })
         } else {
-          res.status(400).send({error: {msg: '账号已存在或者密码错误'}, status: 400});
+          if (entity.dataValues['password'] === reqBody.password) {
+            delete entity.dataValues.password;
+            res.status(200).send({data: entity.dataValues, status: 200});
+          } else {
+            res.status(400).send({error: {msg: '用户名或密码错误'}, status: 400});
+          }
         }
 
       }
