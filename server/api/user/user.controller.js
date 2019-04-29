@@ -173,7 +173,7 @@ export function create(req, res) {
         console.log('22222222');
         console.log(entity.dataValues);
         console.log(reqBody);
-        if (entity.dataValues['user_name'] && entity.dataValues['email'] &&
+        if ((entity.dataValues['user_name'] || entity.dataValues['email']) &&
           entity.dataValues['pid'] && reqBody['password']) {
           User.update(reqBody, {
               where: {
