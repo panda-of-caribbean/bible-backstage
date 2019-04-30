@@ -124,6 +124,7 @@ export function create(req, res) {
       }
     }).then((entity) => {
       if (entity) {
+        reqBody['user_id'] = entity.dataValues['user_id'];
         if (entity.dataValues['email'] && entity.dataValues['password']) {
           User.update(reqBody, {
             where: {
@@ -131,11 +132,11 @@ export function create(req, res) {
             }
           })
           .then((entity) => {
-            console.log('sssssss');
             delete reqBody['password'];
             res.status(200).send({data: reqBody, status: 200});
           })
         } else {
+          console.log('zzzzzz');
           res.status(200).send({data: reqBody, status: 200});
         }
 
