@@ -264,17 +264,17 @@ export function upsert(req, res) {
       if(err){
         res.send(err);
       }else{
-        reqBody.images = path;
+        reqBody.images = path.split('client')[1];
       }
     });
   }
-  return User.update({images: path}, {
+  return User.update({images: path.split('client')[1]}, {
     where: {
       user_id: parseInt(req.params.id, 10)
     }
   })
     .then((entity) => {
-      res.status(200).send({data: path, status: 200});
+      res.status(200).send({data: path.split('client')[1], status: 200});
     })
     .catch(handleError(res));
 }
