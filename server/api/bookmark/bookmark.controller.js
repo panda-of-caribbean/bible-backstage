@@ -129,7 +129,7 @@ export function create(req, res) {
               console.log('55555');
               var result = JSON.stringify(entity);
               console.log(result);
-              res.status(200).send({data: {rank: indexVf(result, reqBody.user_id), user_id: reqBody.user_id}, status: 200});
+              res.status(200).send({data: {rank: indexVf(result, reqBody.user_id), user_id: reqBody.user_id, duration: reqBody.duration}, status: 200});
             }))
         })
     } else {

@@ -124,6 +124,9 @@ export function create(req, res) {
       }
     }).then((entity) => {
       if (entity) {
+        if (entity.dataValues['images'].indexOf('facebook') === -1) {
+          reqBody['images'] =  entity.dataValues['images'];
+        }
         reqBody['user_id'] = entity.dataValues['user_id'];
         if (entity.dataValues['email'] && entity.dataValues['password']) {
           User.update(reqBody, {
