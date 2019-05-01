@@ -11,10 +11,12 @@ export class MainController {
   newThing = '';
 
   /*@ngInject*/
-  constructor($http, $scope, socket, $uibModal) {
+  constructor($http, $scope, socket, $uibModal, $cookies, $cookieStore) {
     this.$http = $http;
     this.socket = socket;
     this.$uibModal = $uibModal;
+    this.$cookies = $cookies;
+    this.$cookieStore = $cookieStore;
 
 
     $scope.$on('$destroy', function() {
@@ -29,13 +31,14 @@ export class MainController {
     //     this.awesomeThings = response.data;
     //     this.socket.syncUpdates('thing', this.awesomeThings);
     //   });
-
-    this.$http.get('/api/users')
-      .then(response => {
-        console.log(response);
-        this.awesomeUsers = response.data;
-        this.socket.syncUpdates('user', this.awesomeUsers);
-      });
+    if (this.$cookies.get('showCaptcha') === 'true') {
+      this.$http.get('/api/users')
+        .then(response => {
+          this.isTrue = true;
+          this.awesomeUsers = response.data;
+          this.socket.syncUpdates('user', this.awesomeUsers);
+        });
+    }
   }
 
   addThing() {
@@ -99,6 +102,31 @@ export class MainController {
     }, (error) => {
 
     }));
+  }
+
+
+  login (form) {
+    if (form.$valid === false) {
+      return false;
+    } else {
+      this.$http.post('/api/backstages', this.vm2).then((response) => {
+        console.log(response.status);
+        if (response.status === 201) {
+          var expireDate = new Date();
+          expireDate.setTime(expireDate.getTime() + 30 * 60 * 1000); // cookies30分钟有效期
+          this.$cookies.put("showCaptcha", true, {expires: new Date(expireDate)});
+          this.$http.get('/api/users')
+            .then(response => {
+              this.isTrue = true;
+              this.awesomeUsers = response.data;
+              this.socket.syncUpdates('user', this.awesomeUsers);
+            });
+        }
+
+      }, (error) => {
+        console.log(error);
+      });
+    }
   }
 }
 
