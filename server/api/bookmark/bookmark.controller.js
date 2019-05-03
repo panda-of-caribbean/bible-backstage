@@ -137,6 +137,7 @@ export function create(req, res) {
         .then((entity) => {
           console.log('6666666');
           console.log(entity);
+          entity.dataValues['rank'] = 0;
           res.status(200).send({data: entity.dataValues, status: 200});
         })
         .catch(handleError(res));
