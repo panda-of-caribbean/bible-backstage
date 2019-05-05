@@ -104,7 +104,6 @@ export function show(req, res) {
 //登录 注册
 export function create(req, res) {
   const reqBody = req.body;
-  console.log(reqBody);
   if (reqBody.password) {
     var str = JSON.stringify(reqBody.password); //明文
     var secret = 'thankgodforgivingmefood001'; //密钥
@@ -139,7 +138,6 @@ export function create(req, res) {
             res.status(200).send({data: reqBody, status: 200});
           })
         } else {
-          console.log('zzzzzz');
           res.status(200).send({data: reqBody, status: 200});
         }
 
@@ -174,9 +172,6 @@ export function create(req, res) {
 
       } else {
         // pid
-        console.log('22222222');
-        console.log(entity.dataValues);
-        console.log(reqBody);
         if ((entity.dataValues['user_name'] || entity.dataValues['email']) &&
           entity.dataValues['pid'] && reqBody['password']) {
           User.update(reqBody, {
@@ -185,8 +180,6 @@ export function create(req, res) {
               }
             })
             .then((entity) => {
-              console.log('xxxxx');
-              console.log(entity);
               delete reqBody['password'];
               res.status(200).send({data: reqBody, status: 200});
             })

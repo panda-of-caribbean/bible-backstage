@@ -104,15 +104,11 @@ function indexVf(arr, index) {
 // Creates a new Bookmark in the DB
 export function create(req, res) {
   const reqBody = req.body;
-  console.log('1111111111111');
-  console.log(reqBody);
   return Bookmark.find({
     where: {
         user_id: reqBody.user_id
     }
   }).then((entity => {
-    console.log('222222222222');
-    console.log(entity);
     if (entity) {
       Bookmark.update(reqBody, {
           where: {
@@ -120,23 +116,17 @@ export function create(req, res) {
           }
         })
         .then((entity) => {
-          console.log('33333333333');
-          console.log(entity);
           Bookmark.findAll({order:[
               ['duration', 'DESC']
           ]})
             .then((entity => {
-              console.log('55555');
               var result = JSON.stringify(entity);
-              console.log(result);
               res.status(200).send({data: {rank: indexVf(result, reqBody.user_id), user_id: reqBody.user_id, duration: reqBody.duration}, status: 200});
             }))
         })
     } else {
       Bookmark.create(reqBody)
         .then((entity) => {
-          console.log('6666666');
-          console.log(entity);
           entity.dataValues['rank'] = 0;
           res.status(200).send({data: entity.dataValues, status: 200});
         })
