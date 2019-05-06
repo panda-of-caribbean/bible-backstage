@@ -76,7 +76,7 @@ export function index(req, res) {
 export function show(req, res) {
   return Bookmark.find({
     where: {
-      book_id: req.params.id
+      user_id: req.params.id
     }
   })
     .then(handleEntityNotFound(res))
