@@ -290,6 +290,7 @@ export function upsert(req, res) {
   })
     .then((entity) => {
       res.status(200).send({data: path.split('client')[1], status: 200});
+      return null;
     })
     .catch(handleError(res));
 }
