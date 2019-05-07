@@ -100,6 +100,12 @@ export function show(req, res) {
     .catch(handleError(res));
 }
 
+// 随机数
+function getRandom(num){
+  var random = Math.floor((Math.random()+Math.floor(Math.random()*9+1))*Math.pow(10,num-1));
+  return random;
+}
+
 
 //登录 注册
 export function create(req, res) {
@@ -158,7 +164,19 @@ export function create(req, res) {
       }
     }).then((entity) => {
       if (!entity) {
+        // console.log('11111');
         if (reqBody['user_name'] && reqBody['email'] && reqBody['password']) {
+         // console.log('11111xxxxx');
+          User.create(reqBody)
+            .then((entity) => {
+              if (entity.dataValues['password']) {
+                delete entity.dataValues.password;
+              }
+              res.status(200).send({data: entity.dataValues, status: 200});
+            })
+        } else if (reqBody['email'] && reqBody['password'] && !reqBody['user_name']) {
+         // console.log('11111yyyyy');
+          reqBody['user_name'] = 'Usuário'+getRandom(9);
           User.create(reqBody)
             .then((entity) => {
               if (entity.dataValues['password']) {
@@ -171,9 +189,12 @@ export function create(req, res) {
         }
 
       } else {
+        // console.log('2222');
+
         // pid
         if ((entity.dataValues['user_name'] || entity.dataValues['email']) &&
           entity.dataValues['pid'] && reqBody['password']) {
+         // console.log('2222xxxx');
           User.update(reqBody, {
               where: {
                 user_id: entity.dataValues['user_id']
@@ -184,6 +205,7 @@ export function create(req, res) {
               res.status(200).send({data: reqBody, status: 200});
             })
         } else {
+          // console.log('2222yyyy');
           if (entity.dataValues['password'] === reqBody.password) {
             delete entity.dataValues.password;
             res.status(200).send({data: entity.dataValues, status: 200});
