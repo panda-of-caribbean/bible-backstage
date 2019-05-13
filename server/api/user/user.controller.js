@@ -185,7 +185,8 @@ export function create(req, res) {
               res.status(200).send({data: entity.dataValues, status: 200});
             })
         } else {
-          res.status(400).send({error: {msg: '用户名或密码错误'}, status: 400});
+          // 用户名或密码错误
+          res.status(400).send({error: {msg: 'Nome de usuário ou senha errada'}, status: 400});
         }
 
       } else {
@@ -210,7 +211,8 @@ export function create(req, res) {
             delete entity.dataValues.password;
             res.status(200).send({data: entity.dataValues, status: 200});
           } else {
-            res.status(400).send({error: {msg: '用户名或密码错误'}, status: 400});
+            // 用户名或密码错误
+            res.status(400).send({error: {msg: 'Nome de usuário ou senha errada'}, status: 400});
           }
         }
 
@@ -220,50 +222,6 @@ export function create(req, res) {
   }
 }
 
-
-// Creates a new User in the DB
-// export function create(req, res) {
-//   const reqBody = req.body;
-//   console.log('yyyyyyyyy');
-//   console.log(reqBody);
-//   if (reqBody.password) {
-//     reqBody.password=jiami.md5(reqBody.password);
-//   }
-//   return User.find({
-//     where: {
-//       $or: {
-//         user_name: reqBody.user_name,
-//         device_id: reqBody.device_id
-//       }
-//     }
-// }).then((entity) => {
-//     console.log('zzzzzzzzzz');
-//     console.log(entity);
-//     if (entity && (entity.dataValues['user_name'] === reqBody['user_name'] ||
-//       (entity.dataValues['device_id'].indexOf(reqBody['device_id']) !== -1 ) && entity.dataValues['user_name'])) {
-//       res.status(400).send({error : {msg: '该用户已存在或者该设备已经被绑定'}, status: 400});
-//     } else if (entity && !entity.dataValues['user_name'] && entity.dataValues['device_id'] === reqBody['device_id']) {
-//       User.update(reqBody, {
-//           where: {
-//             device_id: reqBody.device_id
-//           }
-//         })
-//         .then((entity) => {
-//           console.log('uuuuuuuuu');
-//           console.log(entity);
-//           res.status(200).send({data: reqBody, status: 200});
-//         })
-//     } else {
-//       User.create(reqBody)
-//         .then((entity) => {
-//           console.log('xxxxxxxxx');
-//           console.log(entity);
-//           delete entity.dataValues.password;
-//           res.status(200).send({data: entity.dataValues, status: 200});
-//         })
-//     }
-//   })
-// }
 
 // Upserts the given User in the DB at the specified ID
 export function upsert(req, res) {
