@@ -7,10 +7,19 @@
 import path from 'path';
 import config from '../config/environment';
 import Sequelize from 'sequelize';
+// console.log(config.sequelize.uri);
+// console.log(config.sequelize.options);
+// var db = {
+//   Sequelize,
+//   sequelize: new Sequelize(config.sequelize.uri, config.sequelize.options)
+// };
 
 var db = {
   Sequelize,
-  sequelize: new Sequelize(config.sequelize.uri, config.sequelize.options)
+  sequelize: new Sequelize('awsbiblesuser', 'awsbiblesuser', 'awsqpzlyX123', {
+    host: 'bibles.cgqlvp1j8ss3.sa-east-1.rds.amazonaws.com',
+    dialect: 'mysql'
+  })
 };
 
 // Insert models below
